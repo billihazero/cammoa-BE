@@ -40,4 +40,10 @@ public class JoinService {
         memberRepository.save(member);
     }
 
+    public boolean isIdAvailable(String userLoginId) {
+        Boolean isIdExist = memberRepository.existsByUserLoginId(userLoginId);
+        
+        //사용가능한 id라면 true(1)를 출력
+        return !isIdExist;
+    }
 }

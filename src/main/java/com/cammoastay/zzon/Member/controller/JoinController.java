@@ -20,4 +20,16 @@ public class JoinController {
 
         return "join ok";
     }
+
+    @GetMapping("/idcheck")
+    public String idcheck(@RequestParam String userLoginId){
+        boolean isAvailable = joinService.isIdAvailable(userLoginId);
+
+        if(isAvailable){
+            return "idcheck ok";
+        }
+
+        return "idcheck fail";
+    }
+
 }
