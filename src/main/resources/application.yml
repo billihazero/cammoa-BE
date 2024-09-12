@@ -18,3 +18,5 @@ spring:
 logging:
   level:
     org.springframework.cache: trace
+    org.springframework.security: DEBUG
+    org.hibernate: DEBUG
