@@ -1,4 +1,4 @@
-package com.cammoastay.zzon.Member.dto;
+package com.cammoastay.zzon.User.dto;
 
 public record JoinDTO (
 

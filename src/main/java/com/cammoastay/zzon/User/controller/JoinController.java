@@ -1,7 +1,7 @@
-package com.cammoastay.zzon.Member.controller;
+package com.cammoastay.zzon.User.controller;
 
-import com.cammoastay.zzon.Member.dto.JoinDTO;
-import com.cammoastay.zzon.Member.service.JoinService;
+import com.cammoastay.zzon.User.dto.JoinDTO;
+import com.cammoastay.zzon.User.service.JoinService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,15 +21,5 @@ public class JoinController {
         return "join ok";
     }
 
-    @GetMapping("/idcheck")
-    public String idcheck(@RequestParam String userLoginId){
-        boolean isAvailable = joinService.isIdAvailable(userLoginId);
-
-        if(isAvailable){
-            return "idcheck ok";
-        }
-
-        return "idcheck fail";
-    }
 
 }

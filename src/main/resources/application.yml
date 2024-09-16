@@ -15,8 +15,13 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+    open-in-view: false
+
 logging:
   level:
+    org:
+      hibernate:
+        sql: debug
     org.springframework.cache: trace
     org.springframework.security: DEBUG
     org.hibernate: DEBUG

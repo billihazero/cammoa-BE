@@ -1,8 +1,8 @@
-package com.cammoastay.zzon.Member.service;
+package com.cammoastay.zzon.User.service;
 
-import com.cammoastay.zzon.Member.dto.JoinDTO;
-import com.cammoastay.zzon.Member.entity.Member;
-import com.cammoastay.zzon.Member.repository.MemberRepository;
+import com.cammoastay.zzon.User.dto.JoinDTO;
+import com.cammoastay.zzon.User.entity.Member;
+import com.cammoastay.zzon.User.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,10 +40,5 @@ public class JoinService {
         memberRepository.save(member);
     }
 
-    public boolean isIdAvailable(String userLoginId) {
-        Boolean isIdExist = memberRepository.existsByUserLoginId(userLoginId);
-        
-        //사용가능한 id라면 true(1)를 출력
-        return !isIdExist;
-    }
+
 }
