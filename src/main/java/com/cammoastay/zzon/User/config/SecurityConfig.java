@@ -1,5 +1,6 @@
-package com.cammoastay.zzon.config;
+package com.cammoastay.zzon.User.config;
 
+import com.cammoastay.zzon.User.jwt.JWTFilter;
 import com.cammoastay.zzon.User.jwt.JWTUtil;
 import com.cammoastay.zzon.User.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
@@ -66,6 +67,10 @@ public class SecurityConfig {
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        //JWTFilter 등록
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
         //Filter추가
         http
