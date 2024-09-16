@@ -1,4 +1,6 @@
 spring:
+  jwt:
+    secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbbb
   datasource:
     url: jdbc:postgresql://localhost:5432/cammoa
     username: postgres
@@ -25,3 +27,5 @@ logging:
     org.springframework.cache: trace
     org.springframework.security: DEBUG
     org.hibernate: DEBUG
+
+
