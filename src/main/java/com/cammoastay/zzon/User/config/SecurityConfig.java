@@ -3,6 +3,7 @@ package com.cammoastay.zzon.User.config;
 import com.cammoastay.zzon.User.jwt.JWTFilter;
 import com.cammoastay.zzon.User.jwt.JWTUtil;
 import com.cammoastay.zzon.User.jwt.LoginFilter;
+import com.cammoastay.zzon.User.repository.RefreshRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,14 +24,15 @@ import java.util.Collections;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    //AuthenticationManager가 인자로 받을 AuthenticationConfiguraion 객체 생성자 주입
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
 
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
     }
 
     //AuthenticationManager Bean 등록
@@ -86,7 +88,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("api/v1/login", "/", "/api/v1/*").permitAll()
+                        .requestMatchers( "/", "/api/v1/*").permitAll()
                         .anyRequest().authenticated());
 
         //세션 설정
@@ -100,7 +102,7 @@ public class SecurityConfig {
 
         //Filter추가
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();
