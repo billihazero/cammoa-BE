@@ -4,6 +4,7 @@ import com.cammoastay.zzon.User.jwt.JWTFilter;
 import com.cammoastay.zzon.User.jwt.JWTUtil;
 import com.cammoastay.zzon.User.jwt.LoginFilter;
 import com.cammoastay.zzon.User.repository.RefreshRepository;
+import com.cammoastay.zzon.User.service.SaveTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,12 +28,14 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final SaveTokenService saveTokenService;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, RefreshRepository refreshRepository, SaveTokenService saveTokenService) {
 
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
+        this.saveTokenService = saveTokenService;
     }
 
     //AuthenticationManager Bean 등록
@@ -102,7 +105,7 @@ public class SecurityConfig {
 
         //Filter추가
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, saveTokenService), UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();

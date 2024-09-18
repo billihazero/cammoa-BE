@@ -79,6 +79,7 @@ public class ReissueController {
         String newRefresh = jwtUtil.createJwt("refresh", userLoginId, role, 86400000L);
 
         refreshRepository.deleteByRefresh(refresh);
+
         addUserRefresh(userLoginId, newRefresh, 86400000L);
         //response
             response.setHeader("access", newAccess);

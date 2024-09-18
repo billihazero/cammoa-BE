@@ -12,6 +12,10 @@ import lombok.Setter;
 @Setter
 public class UserRefresh {
 
+    public UserRefresh(){
+
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userTokenId;

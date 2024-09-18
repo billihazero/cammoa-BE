@@ -3,11 +3,14 @@ package com.cammoastay.zzon.User.jwt;
 import com.cammoastay.zzon.User.dto.MemberDetails;
 import com.cammoastay.zzon.User.entity.UserRefresh;
 import com.cammoastay.zzon.User.repository.RefreshRepository;
+import com.cammoastay.zzon.User.service.SaveTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,12 +29,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         private final AuthenticationManager authenticationManager;
         private final JWTUtil jwtUtil;
         private final RefreshRepository refreshRepository;
+        private final SaveTokenService saveTokenService;
 
-        public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
+        public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository,SaveTokenService saveTokenService) {
 
             this.authenticationManager = authenticationManager;
             this.jwtUtil = jwtUtil;
             this.refreshRepository = refreshRepository;
+            this.saveTokenService = saveTokenService;
             setFilterProcessesUrl("/api/v1/login");
         }
 
@@ -66,9 +71,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             userRefresh.setRefresh(refresh);
             userRefresh.setExpiration(date.toString());
 
+            //db에 저장
             refreshRepository.save(userRefresh);
-
         }
+
 
         private Cookie createCookie(String key, String value) {
 
@@ -103,7 +109,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             String access = jwtUtil.createJwt("access", userLoginId, role, 600000L);
             String refresh = jwtUtil.createJwt("refresh",userLoginId, role, 86400000L);
 
+            //db저장
             addUserRefresh(userLoginId, refresh,86400000L);
+
+            //캐시저장
+            saveTokenService.cacheUserRefresh(userLoginId, refresh,86400000L);
 
             response.setHeader("access", access);
             response.addCookie(createCookie("refresh", refresh));
