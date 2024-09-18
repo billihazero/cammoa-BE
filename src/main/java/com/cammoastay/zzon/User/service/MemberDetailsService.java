@@ -27,6 +27,7 @@ public class MemberDetailsService implements UserDetailsService {
         if (memberData != null) {
             return new MemberDetails(memberData);
         }
-        return null;
+        // 존재하지 않으면 UsernameNotFoundException을 던짐
+        throw new UsernameNotFoundException("해당 id가 존재하지 않습니다.");
     }
 }

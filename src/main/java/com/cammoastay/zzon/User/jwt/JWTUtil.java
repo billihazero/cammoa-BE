@@ -20,10 +20,10 @@ public class JWTUtil {
     }
 
     //UserLoginId 검증
-    public String getUserLoginID(String token) {
+    public String getUserLoginId(String token) {
 
         //내가 생성한 secretkey가 맞는지 verify
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("UserLoginId", String.class);
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userLoginId", String.class);
     }
 
     //role 검증

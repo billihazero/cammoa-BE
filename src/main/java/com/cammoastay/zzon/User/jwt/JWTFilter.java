@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 public class JWTFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
@@ -50,20 +51,11 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         //토큰에서 userloginId와 role 획득
-        String userLoginId = jwtUtil.getUserLoginID(token);
+        String userLoginId = jwtUtil.getUserLoginId(token);
         String role = jwtUtil.getRole(token);
 
-        //member객체를 생성하여 값 set
-        Member member = new Member();
-        member.setUserLoginId(userLoginId);
-        member.setUserPasswd("temppassword");
-        member.setUserRole(role);
-
-        //MemberDetails에 회원 정보 객체 담기
-        MemberDetails memberDetails = new MemberDetails(member);
-
-        //스프링 시큐리티 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(memberDetails, null, memberDetails.getAuthorities());
+        //토큰 생성
+        Authentication authToken = new UsernamePasswordAuthenticationToken(userLoginId, null, List.of(() -> role));
         //세션에 사용자 등록
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
