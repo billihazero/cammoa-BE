@@ -3,8 +3,10 @@ package com.cammoastay.zzon.User.jwt;
 import com.cammoastay.zzon.User.dto.MemberDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,6 +50,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 throw new RuntimeException("로그인 실패", e);
             }
 
+
+        }
+
+    private Cookie createCookie(String key, String value) {
+
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(24*60*60);
+        //cookie.setSecure(true);
+        //cookie.setPath("/");
+        cookie.setHttpOnly(true);
+
+        return cookie;
         }
 
         //로그인 성공시 실행하는 메소드 (여기서 JWT를 발급하면 됨)
@@ -56,16 +70,24 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
             System.out.println("로그인성공");
             MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
+            
+            //id저장
             String userLoginId = memberDetails.getUsername(); //username = userLoginId
+            
+            //권한저장
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
             GrantedAuthority auth = iterator.next();
 
             String role = auth.getAuthority();
 
-            String token = jwtUtil.createJwt(userLoginId, role, 60*60*10L);
+            //토큰 생성
+            String access = jwtUtil.createJwt("access", userLoginId, role, 60*60*10L);
+            String refresh = jwtUtil.createJwt("refresh",userLoginId, role, 60*60*10L);
 
-            response.addHeader("Authorization", "Bearer " + token);
+            response.setHeader("access", access);
+            response.addCookie(createCookie("refresh", refresh));
+            response.setStatus(HttpStatus.OK.value());
         }
 
         //로그인 실패시 실행하는 메소드
