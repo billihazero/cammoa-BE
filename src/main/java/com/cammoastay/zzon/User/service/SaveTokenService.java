@@ -18,25 +18,30 @@ public class SaveTokenService {
         this.cacheManager = cacheManager;
     }
 
-    @Cacheable(cacheNames = "memberRefresh", key = "'userLoginId:' + #userLoginId + ':refresh:' + #refresh ", cacheManager = "refreshCacheManager")
+    @Cacheable(cacheNames = "memberRefresh", key = "'refresh:' + #refresh ", cacheManager = "refreshCacheManager")
     public UserRefresh cacheUserRefresh(String userLoginId, String refresh, Long expiredMs) {
 
-        Date date = new Date(System.currentTimeMillis() + expiredMs);
-
         UserRefresh userRefresh = new UserRefresh();
-        userRefresh.setUserLoginId(userLoginId);
         userRefresh.setRefresh(refresh);
-        userRefresh.setExpiration(date.toString());
 
         return userRefresh;
     }
 
-    public UserRefresh getUserRefresh(String userLoginId, String refresh) {
-        String key = "userLoginId:" + userLoginId + ":refresh:" + refresh;
+    public UserRefresh getUserRefresh(String refresh) {
+        String key = "refresh:" + refresh;
         Cache cache = cacheManager.getCache("memberRefresh");
         if (cache != null) {
             return cache.get(key, UserRefresh.class);
         }
         return null;
+    }
+
+    // 캐시에서 특정 refresh 토큰을 삭제하는 메서드
+    public void evictUserRefresh(String refresh) {
+        String key = "refresh:" + refresh;
+        Cache cache = cacheManager.getCache("memberRefresh");
+        if (cache != null) {
+            cache.evict(key); // 캐시에서 삭제
+        }
     }
 }

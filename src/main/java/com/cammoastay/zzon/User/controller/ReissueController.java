@@ -74,7 +74,7 @@ public class ReissueController {
 
         // Redis 캐시에서 리프레시 토큰 확인
         System.out.println("redis에서 refresh 가져왔어 !");
-        UserRefresh cachedUserRefresh = saveTokenService.getUserRefresh(userLoginId, refresh);
+        UserRefresh cachedUserRefresh = saveTokenService.getUserRefresh(refresh);
         if (cachedUserRefresh == null) {
             return new ResponseEntity<>("refresh token not found", HttpStatus.BAD_REQUEST);
         }

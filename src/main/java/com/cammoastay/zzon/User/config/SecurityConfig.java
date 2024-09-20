@@ -1,5 +1,6 @@
 package com.cammoastay.zzon.User.config;
 
+import com.cammoastay.zzon.User.jwt.CustomLogoutFilter;
 import com.cammoastay.zzon.User.jwt.JWTFilter;
 import com.cammoastay.zzon.User.jwt.JWTUtil;
 import com.cammoastay.zzon.User.jwt.LoginFilter;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -107,6 +109,8 @@ public class SecurityConfig {
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, saveTokenService), UsernamePasswordAuthenticationFilter.class);
 
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository, saveTokenService), LogoutFilter.class);
 
         return http.build();
     }
