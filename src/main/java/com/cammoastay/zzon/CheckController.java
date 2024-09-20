@@ -1,4 +1,4 @@
-package com.cammoastay.zzon.User.controller;
+package com.cammoastay.zzon;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,7 +12,7 @@ import java.util.Iterator;
 
 @RestController
 @RequestMapping("/api/v1")
-public class MainController {
+public class CheckController {
 
     @GetMapping("/")
     public String mainP(){
@@ -26,6 +26,6 @@ public class MainController {
         GrantedAuthority auth = iter.next();
         String role = auth.getAuthority();
 
-        return "Main Controller: " + userLoginId + role;
+        return "Check Controller: " + userLoginId + role;
     }
 }

@@ -25,6 +25,7 @@ public class JWTFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         //access토큰의 유효성 검증
         
         String authorizationHeader = request.getHeader("Authorization");

@@ -41,4 +41,7 @@ public class JoinService {
     }
 
 
+    public boolean checkId(String userLoginId) {
+        return memberRepository.existsByUserLoginId(userLoginId);
+    }
 }
