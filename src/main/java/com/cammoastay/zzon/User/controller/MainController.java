@@ -16,6 +16,7 @@ public class MainController {
 
     @GetMapping("/")
     public String mainP(){
+
         String userLoginId = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

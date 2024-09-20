@@ -14,11 +14,11 @@ public class JoinController {
         this.joinService = joinService;
     }
 
-    @PostMapping("/memberjoin")
+    @PostMapping("/join")
     public String joinProcess(@RequestBody JoinDTO joinDTO){
         joinService.joinProcess(joinDTO);
 
-        return "join ok";
+        return "회원가입 성공";
     }
 
 

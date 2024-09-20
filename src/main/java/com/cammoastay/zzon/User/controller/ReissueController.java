@@ -3,6 +3,7 @@ package com.cammoastay.zzon.User.controller;
 import com.cammoastay.zzon.User.entity.UserRefresh;
 import com.cammoastay.zzon.User.jwt.JWTUtil;
 import com.cammoastay.zzon.User.repository.RefreshRepository;
+import com.cammoastay.zzon.User.service.SaveTokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,93 +22,69 @@ public class ReissueController {
 
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final SaveTokenService saveTokenService;
 
-    public ReissueController(JWTUtil jwtUtil, RefreshRepository refreshRepository) {
+    public ReissueController(JWTUtil jwtUtil, RefreshRepository refreshRepository, SaveTokenService saveTokenService) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
+        this.saveTokenService = saveTokenService;
     }
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 
-        //get refresh token
+        //refreshtoken cookie에 담기
         String refresh = null;
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
 
-            if (cookie.getName().equals("refresh")) {
-
-                refresh = cookie.getValue();
+        if(cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("refresh")) {
+                    refresh = cookie.getValue();
+                }
             }
         }
 
+        //refresh가 없다면 에러반환
         if (refresh == null) {
-
-            //response status code
             return new ResponseEntity<>("refresh token null", HttpStatus.BAD_REQUEST);
         }
 
-        //expired check
+        //refresh 검중
         try {
-
-        jwtUtil.isExpired(refresh);
+            jwtUtil.isExpired(refresh);
+            
         } catch (ExpiredJwtException e) {
-
-        //response status code
-        return new ResponseEntity<>("refresh token expired", HttpStatus.BAD_REQUEST);
+            //refresh 만료되었다면 재 인증 필요
+            return new ResponseEntity<>("재 로그인이 필요합니다.", HttpStatus.BAD_REQUEST);
         }
+
+        //refresh 토큰 유효성 검사-----------------
 
         // 토큰이 refresh인지 확인 (발급시 페이로드에 명시)
         String category = jwtUtil.getCategory(refresh);
 
+        //refresh가 아니라면 에러 반환
         if (!category.equals("refresh")) {
-
-                //response status code
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
-        }
-
-        Boolean isExist = refreshRepository.existsByRefresh(refresh);
-        if (!isExist) {
-            return new ResponseEntity<>("refresh token not found", HttpStatus.BAD_REQUEST);
         }
 
         String userLoginId = jwtUtil.getUserLoginId(refresh);
         String role = jwtUtil.getRole(refresh);
 
-        //make new JWT
-        String newAccess = jwtUtil.createJwt("access", userLoginId, role, 600000L);
-        String newRefresh = jwtUtil.createJwt("refresh", userLoginId, role, 86400000L);
-
-        refreshRepository.deleteByRefresh(refresh);
-
-        addUserRefresh(userLoginId, newRefresh, 86400000L);
-        //response
-            response.setHeader("access", newAccess);
-            response.addCookie(createCookie("refresh", newRefresh));
-
-            return new ResponseEntity<>(HttpStatus.OK);
+        // Redis 캐시에서 리프레시 토큰 확인
+        System.out.println("redis에서 refresh 가져왔어 !");
+        UserRefresh cachedUserRefresh = saveTokenService.getUserRefresh(userLoginId, refresh);
+        if (cachedUserRefresh == null) {
+            return new ResponseEntity<>("refresh token not found", HttpStatus.BAD_REQUEST);
         }
 
-    private void addUserRefresh(String userLoginId, String refresh, Long expiredMs){
-        Date date = new Date(System.currentTimeMillis() + expiredMs);
+        //저장한 정보를 통해 새로운 토큰 생성
+        String newAccess = jwtUtil.createJwt("access", userLoginId, role, 600000L);
+        System.out.println("새로운 토큰 발급");
+        response.setHeader("Authorization", "Bearer " + newAccess);
 
-        UserRefresh userRefresh = new UserRefresh();
-        userRefresh.setUserLoginId(userLoginId);
-        userRefresh.setRefresh(refresh);
-        userRefresh.setExpiration(date.toString());
-
-        refreshRepository.save(userRefresh);
-
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private Cookie createCookie(String key, String value) {
-
-       Cookie cookie = new Cookie(key, value);
-       cookie.setMaxAge(24*60*60);
-       //cookie.setSecure(true);
-       // cookie.setPath("/");
-       // cookie.setHttpOnly(true);
-
-        return cookie;
-        }
 }

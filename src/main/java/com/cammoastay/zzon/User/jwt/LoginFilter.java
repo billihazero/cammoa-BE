@@ -115,7 +115,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             //캐시저장
             saveTokenService.cacheUserRefresh(userLoginId, refresh,86400000L);
 
-            response.setHeader("access", access);
+            response.setHeader("Authorization", "Bearer " + access);
             response.addCookie(createCookie("refresh", refresh));
             response.setStatus(HttpStatus.OK.value());
         }
