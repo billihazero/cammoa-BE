@@ -48,7 +48,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 Map<String, String> requestBody = objectMapper.readValue(request.getInputStream(), Map.class);
 
                 // Map에서 userLoginId와 userPasswd 추출
-                String loginId = requestBody.get("loginId");
+                String userLoginId = requestBody.get("userLoginId");
                 String userPasswd = requestBody.get("userPasswd");
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginId, userPasswd, null);
