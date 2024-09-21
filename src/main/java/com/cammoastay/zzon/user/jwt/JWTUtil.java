@@ -1,4 +1,4 @@
-package com.cammoastay.zzon.User.jwt;
+package com.cammoastay.zzon.user.jwt;
 
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +25,11 @@ public class JWTUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
 
+    public Long getUserId(String token) {
+
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("userId", Long.class);
+    }
+
     //userLoginId 검증
     public String getUserLoginId(String token) {
 
@@ -46,9 +51,10 @@ public class JWTUtil {
 
     //issuedAt : 토큰이 언제 발행됐는지
     //category : Access / Refresh
-    public String createJwt(String category, String userLoginId, String role, Long expiredMs){
+    public String createJwt(String category, Long userId, String userLoginId, String role, Long expiredMs){
         return Jwts.builder()
                 .claim("category", category)
+                .claim("userId", userId)
                 .claim("userLoginId", userLoginId)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))

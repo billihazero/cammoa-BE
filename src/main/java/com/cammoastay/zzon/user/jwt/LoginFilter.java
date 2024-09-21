@@ -1,16 +1,15 @@
-package com.cammoastay.zzon.User.jwt;
+package com.cammoastay.zzon.user.jwt;
 
-import com.cammoastay.zzon.User.dto.MemberDetails;
-import com.cammoastay.zzon.User.entity.UserRefresh;
-import com.cammoastay.zzon.User.repository.RefreshRepository;
-import com.cammoastay.zzon.User.service.TokenService;
+import com.cammoastay.zzon.user.dto.MemberDetails;
+import com.cammoastay.zzon.user.entity.UserRefresh;
+import com.cammoastay.zzon.user.repository.RefreshRepository;
+import com.cammoastay.zzon.user.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -108,6 +107,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             MemberDetails memberDetails = (MemberDetails) authentication.getPrincipal();
             
             //id저장
+            Long userId = memberDetails.getUserId();
             String userLoginId = memberDetails.getUsername(); //username = userLoginId
             
             //권한저장
@@ -118,8 +118,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             String role = auth.getAuthority();
 
             //토큰 생성
-            String access = jwtUtil.createJwt("access", userLoginId, role, 3600000L); //1시간
-            String refresh = jwtUtil.createJwt("refresh",userLoginId, role, 86400000L); //하루
+            String access = jwtUtil.createJwt("access", userId, userLoginId, role, 3600000L); //1시간
+            String refresh = jwtUtil.createJwt("refresh",userId, userLoginId, role, 86400000L); //하루
 
             //db저장
             addUserRefresh(userLoginId, refresh,86400000L);
@@ -130,6 +130,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             response.addCookie(createAccessCookie("access", access));
             response.addCookie(createCookie("refresh", refresh));
             response.setStatus(HttpStatus.OK.value());
+
+            System.out.println("로그인성공!" +userId + "=" + userLoginId);
         }
 
         //로그인 실패시 실행하는 메소드

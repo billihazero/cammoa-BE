@@ -1,7 +1,5 @@
-package com.cammoastay.zzon.User.jwt;
+package com.cammoastay.zzon.user.jwt;
 
-import com.cammoastay.zzon.User.dto.MemberDetails;
-import com.cammoastay.zzon.User.entity.Member;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

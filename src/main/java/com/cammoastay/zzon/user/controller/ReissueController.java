@@ -1,9 +1,8 @@
-package com.cammoastay.zzon.User.controller;
+package com.cammoastay.zzon.user.controller;
 
-import com.cammoastay.zzon.User.entity.UserRefresh;
-import com.cammoastay.zzon.User.jwt.JWTUtil;
-import com.cammoastay.zzon.User.repository.RefreshRepository;
-import com.cammoastay.zzon.User.service.TokenService;
+import com.cammoastay.zzon.user.entity.UserRefresh;
+import com.cammoastay.zzon.user.jwt.JWTUtil;
+import com.cammoastay.zzon.user.service.TokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,7 +64,7 @@ public class ReissueController {
         if (!category.equals("refresh")) {
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
         }
-
+        Long userId = jwtUtil.getUserId(refresh);
         String userLoginId = jwtUtil.getUserLoginId(refresh);
         String role = jwtUtil.getRole(refresh);
 
@@ -77,7 +76,7 @@ public class ReissueController {
         }
 
         //저장한 정보를 통해 새로운 토큰 생성
-        String newAccess = jwtUtil.createJwt("access", userLoginId, role, 3600000L);
+        String newAccess = jwtUtil.createJwt("access", userId, userLoginId, role, 3600000L);
         System.out.println("새로운 토큰 발급");
         response.addCookie(createAccessCookie("access", newAccess));
 
