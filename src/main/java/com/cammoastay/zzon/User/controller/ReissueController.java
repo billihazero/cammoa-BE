@@ -3,7 +3,7 @@ package com.cammoastay.zzon.User.controller;
 import com.cammoastay.zzon.User.entity.UserRefresh;
 import com.cammoastay.zzon.User.jwt.JWTUtil;
 import com.cammoastay.zzon.User.repository.RefreshRepository;
-import com.cammoastay.zzon.User.service.SaveTokenService;
+import com.cammoastay.zzon.User.service.TokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,20 +14,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-
 @RestController
 @RequestMapping("/api/v1")
 public class ReissueController {
 
     private final JWTUtil jwtUtil;
-    private final RefreshRepository refreshRepository;
-    private final SaveTokenService saveTokenService;
+    private final TokenService tokenService;
 
-    public ReissueController(JWTUtil jwtUtil, RefreshRepository refreshRepository, SaveTokenService saveTokenService) {
+    //accessToken 재발급 로직
+    public ReissueController(JWTUtil jwtUtil, TokenService tokenService) {
         this.jwtUtil = jwtUtil;
-        this.refreshRepository = refreshRepository;
-        this.saveTokenService = saveTokenService;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/reissue")
@@ -74,17 +71,27 @@ public class ReissueController {
 
         // Redis 캐시에서 리프레시 토큰 확인
         System.out.println("redis에서 refresh 가져왔어 !");
-        UserRefresh cachedUserRefresh = saveTokenService.getUserRefresh(refresh);
+        UserRefresh cachedUserRefresh = tokenService.getUserRefresh(refresh);
         if (cachedUserRefresh == null) {
             return new ResponseEntity<>("refresh token not found", HttpStatus.BAD_REQUEST);
         }
 
         //저장한 정보를 통해 새로운 토큰 생성
-        String newAccess = jwtUtil.createJwt("access", userLoginId, role, 600000L);
+        String newAccess = jwtUtil.createJwt("access", userLoginId, role, 3600000L);
         System.out.println("새로운 토큰 발급");
-        response.setHeader("Authorization", "Bearer " + newAccess);
+        response.addCookie(createAccessCookie("access", newAccess));
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private Cookie createAccessCookie(String key, String value) {
+
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(60*60);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+
+        return cookie;
     }
 
 }

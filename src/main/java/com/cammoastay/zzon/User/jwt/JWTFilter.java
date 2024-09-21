@@ -5,6 +5,7 @@ import com.cammoastay.zzon.User.entity.Member;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,42 +25,49 @@ public class JWTFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        // 회원가입과 로그인 경로를 제외
+        return path.startsWith("/api/v1/join") || path.startsWith("/api/v1/login");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         //access토큰의 유효성 검증
-        
-        String authorizationHeader = request.getHeader("Authorization");
 
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
+        //refreshtoken cookie에 담기
+        String access = null;
+        Cookie[] cookies = request.getCookies();
+
+        if(cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("access")) {
+                    access = cookie.getValue();
+                }
+            }
         }
 
-        String accessToken = authorizationHeader.substring(7); // "Bearer " 이후의 토큰만 추출
-
-        //Authorization 헤더 검증
-        if (accessToken == null) {
+        if (access == null) {
             filterChain.doFilter(request, response);
-
-            //조건이 해당되면 메소드 종료 (필수)
             return;
         }
 
         //access토큰 만료 여부 확인
         //만료되었다면 다음 필터로 넘기지 x
         try {
-            jwtUtil.isExpired(accessToken);
+            jwtUtil.isExpired(access);
         } catch (ExpiredJwtException e) {
 
             PrintWriter writer = response.getWriter();
-            writer.print("accessToken이 만료되었습니다.");
+            writer.print("accessToken123");
 
             //response status code
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        String category = jwtUtil.getCategory(accessToken);
+        String category = jwtUtil.getCategory(access);
 
         if (!category.equals("access")) {
 
@@ -74,8 +82,8 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         //토큰에서 loginId와 role 획득
-        String userLoginId = jwtUtil.getUserLoginId(accessToken);
-        String role = jwtUtil.getRole(accessToken);
+        String userLoginId = jwtUtil.getUserLoginId(access);
+        String role = jwtUtil.getRole(access);
 
         //토큰 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(userLoginId, null, List.of(() -> role));

@@ -2,7 +2,7 @@ package com.cammoastay.zzon.User.jwt;
 
 import com.cammoastay.zzon.User.entity.UserRefresh;
 import com.cammoastay.zzon.User.repository.RefreshRepository;
-import com.cammoastay.zzon.User.service.SaveTokenService;
+import com.cammoastay.zzon.User.service.TokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -11,8 +11,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
@@ -23,12 +21,12 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
     private final RefreshRepository refreshRepository;
 
-    private final SaveTokenService saveTokenService;
+    private final TokenService tokenService;
 
-    public CustomLogoutFilter(JWTUtil jwtUtil, RefreshRepository refreshRepository, SaveTokenService saveTokenService) {
+    public CustomLogoutFilter(JWTUtil jwtUtil, RefreshRepository refreshRepository, TokenService tokenService) {
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
-        this.saveTokenService = saveTokenService;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -90,7 +88,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         //DB에 저장되어 있지 않으면 에러
         System.out.println("redis에서 refresh 가져왔어 !");
-        UserRefresh cachedUserRefresh = saveTokenService.getUserRefresh(refresh);
+        UserRefresh cachedUserRefresh = tokenService.getUserRefresh(refresh);
         if (cachedUserRefresh == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
@@ -101,7 +99,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         refreshRepository.deleteByRefresh(refresh);
 
         //캐시에서도 삭제
-        saveTokenService.evictUserRefresh(refresh);
+        tokenService.evictUserRefresh(refresh);
         System.out.println("로그아웃 완료");
 
         //Refresh 토큰 Cookie 값 0

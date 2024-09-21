@@ -3,15 +3,14 @@ package com.cammoastay.zzon.User.jwt;
 import com.cammoastay.zzon.User.dto.MemberDetails;
 import com.cammoastay.zzon.User.entity.UserRefresh;
 import com.cammoastay.zzon.User.repository.RefreshRepository;
-import com.cammoastay.zzon.User.service.SaveTokenService;
+import com.cammoastay.zzon.User.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,14 +28,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         private final AuthenticationManager authenticationManager;
         private final JWTUtil jwtUtil;
         private final RefreshRepository refreshRepository;
-        private final SaveTokenService saveTokenService;
+        private final TokenService tokenService;
 
-        public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository,SaveTokenService saveTokenService) {
+        public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository, TokenService tokenService) {
 
             this.authenticationManager = authenticationManager;
             this.jwtUtil = jwtUtil;
             this.refreshRepository = refreshRepository;
-            this.saveTokenService = saveTokenService;
+            this.tokenService = tokenService;
             setFilterProcessesUrl("/api/v1/login");
         }
 
@@ -75,13 +74,26 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             refreshRepository.save(userRefresh);
         }
 
+        //access cookie
+        private Cookie createAccessCookie(String key, String value) {
 
+            Cookie cookie = new Cookie(key, value);
+            
+            cookie.setMaxAge(60*60); //1시간
+            cookie.setSecure(true);
+            cookie.setPath("/");
+
+            return cookie;
+        }
+
+
+        //refresh cookie
         private Cookie createCookie(String key, String value) {
 
             Cookie cookie = new Cookie(key, value);
             cookie.setMaxAge(24*60*60);
-            //cookie.setSecure(true);
-            //cookie.setPath("/");
+            cookie.setSecure(true);
+            cookie.setPath("/");
             cookie.setHttpOnly(true);
 
             return cookie;
@@ -106,16 +118,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             String role = auth.getAuthority();
 
             //토큰 생성
-            String access = jwtUtil.createJwt("access", userLoginId, role, 600000L);
-            String refresh = jwtUtil.createJwt("refresh",userLoginId, role, 86400000L);
+            String access = jwtUtil.createJwt("access", userLoginId, role, 3600000L); //1시간
+            String refresh = jwtUtil.createJwt("refresh",userLoginId, role, 86400000L); //하루
 
             //db저장
             addUserRefresh(userLoginId, refresh,86400000L);
 
             //캐시저장
-            saveTokenService.cacheUserRefresh(userLoginId, refresh,86400000L);
+            tokenService.cacheUserRefresh(userLoginId, refresh,86400000L);
 
-            response.setHeader("Authorization", "Bearer " + access);
+            response.addCookie(createAccessCookie("access", access));
             response.addCookie(createCookie("refresh", refresh));
             response.setStatus(HttpStatus.OK.value());
         }

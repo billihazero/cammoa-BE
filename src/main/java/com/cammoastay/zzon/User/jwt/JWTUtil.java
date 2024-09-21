@@ -38,8 +38,6 @@ public class JWTUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
     }
 
-
-
     //token 만료 확인
     public Boolean isExpired(String token) {
 
