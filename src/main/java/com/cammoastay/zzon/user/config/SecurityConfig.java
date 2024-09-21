@@ -1,11 +1,11 @@
-package com.cammoastay.zzon.User.config;
+package com.cammoastay.zzon.user.config;
 
-import com.cammoastay.zzon.User.jwt.CustomLogoutFilter;
-import com.cammoastay.zzon.User.jwt.JWTFilter;
-import com.cammoastay.zzon.User.jwt.JWTUtil;
-import com.cammoastay.zzon.User.jwt.LoginFilter;
-import com.cammoastay.zzon.User.repository.RefreshRepository;
-import com.cammoastay.zzon.User.service.TokenService;
+import com.cammoastay.zzon.user.jwt.CustomLogoutFilter;
+import com.cammoastay.zzon.user.jwt.JWTFilter;
+import com.cammoastay.zzon.user.jwt.JWTUtil;
+import com.cammoastay.zzon.user.jwt.LoginFilter;
+import com.cammoastay.zzon.user.repository.RefreshRepository;
+import com.cammoastay.zzon.user.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

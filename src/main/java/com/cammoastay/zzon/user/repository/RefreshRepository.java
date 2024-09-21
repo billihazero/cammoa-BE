@@ -1,6 +1,6 @@
-package com.cammoastay.zzon.User.repository;
+package com.cammoastay.zzon.user.repository;
 
-import com.cammoastay.zzon.User.entity.UserRefresh;
+import com.cammoastay.zzon.user.entity.UserRefresh;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 

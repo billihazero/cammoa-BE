@@ -1,6 +1,6 @@
-package com.cammoastay.zzon.User.service;
+package com.cammoastay.zzon.user.service;
 
-import com.cammoastay.zzon.User.entity.UserRefresh;
+import com.cammoastay.zzon.user.entity.UserRefresh;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;

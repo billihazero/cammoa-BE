@@ -1,7 +1,7 @@
-package com.cammoastay.zzon.User.controller;
+package com.cammoastay.zzon.user.controller;
 
-import com.cammoastay.zzon.User.dto.JoinDTO;
-import com.cammoastay.zzon.User.service.JoinService;
+import com.cammoastay.zzon.user.dto.JoinDTO;
+import com.cammoastay.zzon.user.service.JoinService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

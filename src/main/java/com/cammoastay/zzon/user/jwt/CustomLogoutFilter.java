@@ -1,8 +1,8 @@
-package com.cammoastay.zzon.User.jwt;
+package com.cammoastay.zzon.user.jwt;
 
-import com.cammoastay.zzon.User.entity.UserRefresh;
-import com.cammoastay.zzon.User.repository.RefreshRepository;
-import com.cammoastay.zzon.User.service.TokenService;
+import com.cammoastay.zzon.user.entity.UserRefresh;
+import com.cammoastay.zzon.user.repository.RefreshRepository;
+import com.cammoastay.zzon.user.service.TokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

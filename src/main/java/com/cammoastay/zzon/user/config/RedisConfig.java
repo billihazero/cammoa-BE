@@ -1,4 +1,4 @@
-package com.cammoastay.zzon.User.config;
+package com.cammoastay.zzon.user.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

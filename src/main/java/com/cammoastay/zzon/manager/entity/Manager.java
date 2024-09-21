@@ -1,4 +1,4 @@
-package com.cammoastay.zzon.Manager.entity;
+package com.cammoastay.zzon.manager.entity;
 
 import jakarta.persistence.*;
 

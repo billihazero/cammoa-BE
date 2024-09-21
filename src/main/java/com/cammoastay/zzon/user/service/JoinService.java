@@ -1,8 +1,8 @@
-package com.cammoastay.zzon.User.service;
+package com.cammoastay.zzon.user.service;
 
-import com.cammoastay.zzon.User.dto.JoinDTO;
-import com.cammoastay.zzon.User.entity.Member;
-import com.cammoastay.zzon.User.repository.MemberRepository;
+import com.cammoastay.zzon.user.dto.JoinDTO;
+import com.cammoastay.zzon.user.entity.Member;
+import com.cammoastay.zzon.user.repository.MemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 

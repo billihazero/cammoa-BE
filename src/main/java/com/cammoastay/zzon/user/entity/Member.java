@@ -1,4 +1,4 @@
-package com.cammoastay.zzon.User.entity;
+package com.cammoastay.zzon.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

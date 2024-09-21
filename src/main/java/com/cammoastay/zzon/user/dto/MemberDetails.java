@@ -1,12 +1,11 @@
-package com.cammoastay.zzon.User.dto;
+package com.cammoastay.zzon.user.dto;
 
-import com.cammoastay.zzon.User.entity.Member;
+import com.cammoastay.zzon.user.entity.Member;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class MemberDetails implements UserDetails {
     private final Member member;
@@ -28,6 +27,10 @@ public class MemberDetails implements UserDetails {
             }
         });
         return collection;
+    }
+
+    public Long getUserId() {
+        return member.getUserId();
     }
 
     @Override
